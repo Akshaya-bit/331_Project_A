@@ -9,85 +9,48 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class image {
-	public static short [][] grayImage;
-	public static int width;
-	public static int height;
-	private static BufferedImage image;
+    public static short[][] readGrayscaleImage(String fileName) {
+        short[][] grayImage = null;
+        try {
+            BufferedImage image = ImageIO.read(new File(fileName));
+            int width = image.getWidth();
+            int height = image.getHeight();
 
-	static byte[] pixels;
+            byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+            grayImage = new short[height][width];
 
-	public static void main(String[] args) throws IOException {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int coord = 3 * (i * width + j);
+                    int pr = ((short) pixels[coord] & 0xff); // red
+                    int pg = (((short) pixels[coord + 1] & 0xff)); // green
+                    int pb = (((short) pixels[coord + 2] & 0xff)); // blue
+                    grayImage[i][j] = (short) Math.round(0.299 * pr + 0.587 * pg + 0.114 * pb);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return grayImage;
+    }
 
-		String fileNameinp="Template.jpg";
+    public static void main(String[] args) throws IOException {
+        String templateFileName = "Template.jpg";
+        String sourceFileName = "TenCardG.jpg";
 
-		File inp=new File(fileNameinp);
+        short[][] templateImage = readGrayscaleImage(templateFileName);
+        short[][] sourceImage = readGrayscaleImage(sourceFileName);
 
-		BufferedImage template_image = ImageIO.read(inp);
+        // You can print dimensions to verify
+        System.out.println("Template Image: " + templateImage.length + "x" + templateImage[0].length);
+        System.out.println("Source Image: " + sourceImage.length + "x" + sourceImage[0].length);
 
-		int width = template_image.getWidth();
-		int  height = template_image.getHeight();          
-		short[][] source_img=readColourImage(fileNameinp);
+        // Call the template matching function here with the grayscale images
+        templateMatching(templateImage, sourceImage);
+    }
 
-		pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-		//System.out.println("Dimension of the image: WxH= " + width + " x "+height+" "+ "| num of pixels: "+ pixels.length);
-
-
-		String fileNameinp1="TenCardG.jpg";
-		File inp1=new File(fileNameinp1);
-
-		BufferedImage image_source = ImageIO.read(inp1);
-
-		int width_source = image_source.getWidth();
-		int height_source = image_source.getHeight();          
-
-		short[][] source_img1=readColourImage(fileNameinp1);
-
-		pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-		//System.out.println("Dimension of the image: WxH= " + width + " x "+height+" "+ "| num of pixels: "+ pixels.length);
-
-	}
-
-
-	public static short[][] readColourImage(String fileName) {
-
-		try
-		{
-			// RGB pixel values
-			byte[] pixels;
-
-			File inp=new File(fileName);
-			image = ImageIO.read(inp);
-			width = image.getWidth();
-			height = image.getHeight();          
-
-
-			pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-			System.out.println("Dimension of the image: WxH= " + width + " x "+height+" "+ "| num of pixels: "+ pixels.length);
-
-
-
-			//rgb2gray in a 2D array grayImage                 
-			int pr;// red
-			int pg;//  green
-			int pb;// blue     
-
-			grayImage =new short [height][width];
-			int coord;
-			for (int i=0; i<height;i++)
-				for(int j=0;j<width;j++)
-				{        		     
-					coord= 3*(i*width+j);
-					pr= ((short) pixels[coord] & 0xff); // red
-					pg= (((short) pixels[coord+1] & 0xff));//  green
-					pb= (((short) pixels[coord+2] & 0xff));// blue                
-
-					grayImage[i][j]=(short)Math.round(0.299 *pr + 0.587 * pg  + 0.114 * pb);         
-
-				}  
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		return grayImage; 
-
-	}}
+    
+    public static void templateMatching(short[][] templateImage, short[][] sourceImage) {
+        
+    }
+}
