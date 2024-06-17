@@ -1,5 +1,6 @@
-package ecte331;
+//This shows the match co-ordinates, still not getting image 
 
+package ecte331;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -43,12 +44,11 @@ public class image {
         short[][] templateImage = readGrayscaleImage(templateFileName);
         short[][] sourceImage = readGrayscaleImage(sourceFileName);
 
-        // You can print dimensions to verify
         System.out.println("Template Image: " + templateImage.length + "x" + templateImage[0].length);
         System.out.println("Source Image: " + sourceImage.length + "x" + sourceImage[0].length);
 
         // Call the template matching function here with the grayscale images
-        templateMatching(templateImage, sourceImage);
+        templateMatching(templateImage, sourceImage, sourceFileName);
     }
 
     public static void templateMatching(short[][] templateImage, short[][] sourceImage, String sourceFileName) {
