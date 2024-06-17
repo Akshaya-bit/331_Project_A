@@ -1,4 +1,4 @@
-//Matches take loooong time to compute, IDK why. image now opens using desktop library. 
+//Matches take loooong time to compute, IDK why (probably becuase its single thread :P). image now opens using desktop library. This is 
 package ecte331;
 
 import java.awt.Color;
