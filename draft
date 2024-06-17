@@ -1,6 +1,8 @@
 package ecte331;
 
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
@@ -49,8 +51,75 @@ public class image {
         templateMatching(templateImage, sourceImage);
     }
 
-    
-    public static void templateMatching(short[][] templateImage, short[][] sourceImage) {
-        
+    public static void templateMatching(short[][] templateImage, short[][] sourceImage, String sourceFileName) {
+        int r1 = sourceImage.length;
+        int c1 = sourceImage[0].length;
+        int r2 = templateImage.length;
+        int c2 = templateImage[0].length;
+        int tempSize = r2 * c2;
+        double minimum = Double.MAX_VALUE;
+        double ratio = 10; // for calibration
+
+        double[][] absDiffMat = new double[r1 - r2 + 1][c1 - c2 + 1];
+
+        for (int i = 0; i <= r1 - r2; i++) {
+            for (int j = 0; j <= c1 - c2; j++) {
+                double absDiff = 0.0;
+                for (int m = 0; m < r2; m++) {
+                    for (int n = 0; n < c2; n++) {
+                        absDiff += Math.abs(sourceImage[i + m][j + n] - templateImage[m][n]);
+                    }
+                }
+                absDiff /= tempSize;
+                absDiffMat[i][j] = absDiff;
+                if (absDiff < minimum) {
+                    minimum = absDiff;
+                }
+            }
+        }
+
+        double threshold = ratio * minimum;
+        int[][] coordinates = new int[(r1 - r2 + 1) * (c1 - c2 + 1)][2];
+        int coordCount = 0;
+
+        for (int i = 0; i < absDiffMat.length; i++) {
+            for (int j = 0; j < absDiffMat[i].length; j++) {
+                if (absDiffMat[i][j] <= threshold) {
+                    coordinates[coordCount][0] = i;
+                    coordinates[coordCount][1] = j;
+                    coordCount++;
+                }
+            }
+        }
+
+        // Print coordinates for debugging
+        for (int i = 0; i < coordCount; i++) {
+            System.out.println("Match found at: (" + coordinates[i][0] + ", " + coordinates[i][1] + ")");
+        }
+
+        // Draw rectangles on the source image
+        String outputFileName = "OutputImage.jpg";
+        drawRectangles(sourceFileName, coordinates, coordCount, r2, c2, outputFileName);
+    }
+
+    public static void drawRectangles(String sourceFileName, int[][] coordinates, int coordCount, int rectHeight, int rectWidth, String outputFileName) {
+        try {
+            File input = new File(sourceFileName);
+            BufferedImage sourceImage = ImageIO.read(input);
+
+            Graphics2D g2D = sourceImage.createGraphics();
+            g2D.setColor(Color.RED);
+
+            for (int i = 0; i < coordCount; i++) {
+                g2D.drawRect(coordinates[i][1], coordinates[i][0], rectWidth, rectHeight);
+            }
+
+            g2D.dispose();
+
+            File output = new File(outputFileName);
+            ImageIO.write(sourceImage, "jpg", output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
