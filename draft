@@ -1,8 +1,8 @@
-//This shows the match co-ordinates, still not getting image 
-
+//Matches take loooong time to compute, IDK why. image now opens using desktop library. 
 package ecte331;
 
 import java.awt.Color;
+import java.awt.Desktop; // to open image on desktop 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
@@ -97,8 +97,8 @@ public class image {
             System.out.println("Match found at: (" + coordinates[i][0] + ", " + coordinates[i][1] + ")");
         }
 
-        // Draw rectangles on the source image
-        String outputFileName = "OutputImage.jpg";
+        // To draw rectangles on the source image
+        String outputFileName = "OutputImage.jpg";// new image
         drawRectangles(sourceFileName, coordinates, coordCount, r2, c2, outputFileName);
     }
 
@@ -118,8 +118,21 @@ public class image {
 
             File output = new File(outputFileName);
             ImageIO.write(sourceImage, "jpg", output);
+
+            System.out.println("Output image saved to: " + output.getAbsolutePath());
+
+            // Open the image after matches 
+            Desktop desktop = Desktop.getDesktop();
+            if (output.exists()) {
+                desktop.open(output);
+            } else {
+                System.out.println("File not found: " + output.getAbsolutePath());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
 }
